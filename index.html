@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAC Genomic Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+ :root{--navy:#15314f;--navy2:#22507e;--ink:#1f2937;--muted:#6b7280;--bg:#e9eef3;--card:#fff;--line:#e2e8f0;
+   --O:#b2182b;--LO:#ef8a62;--VUS:#9aa3ad}
+ *{box-sizing:border-box}
+ html,body{height:100%;margin:0}
+ body{font-family:Inter,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;overflow:hidden}
+ .top{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:10px 18px;flex:0 0 auto}
+ .top h1{font-size:1.05rem;font-weight:700;margin:0;white-space:nowrap}
+ .top .sub{font-size:.72rem;color:#cdddee}
+ .subbar{display:flex;align-items:center;gap:14px;padding:11px 18px;background:#fff;border-bottom:1px solid var(--line);flex:0 0 auto;flex-wrap:wrap}
+ .sublabel{font-size:.74rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+ .pills{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+ .pill{font-family:inherit;font-size:.95rem;font-weight:700;color:var(--navy);background:#eef2f7;border:1.5px solid #d3deeb;border-radius:999px;padding:8px 18px;cursor:pointer;display:flex;align-items:center;gap:7px;transition:.15s}
+ .pill:hover{border-color:var(--navy2);background:#e3ebf4}
+ .pill.active{background:var(--navy);color:#fff;border-color:var(--navy);box-shadow:0 4px 12px rgba(21,49,79,.28)}
+ .pill .n{font-size:.74em;font-weight:600;opacity:.6;background:rgba(0,0,0,.06);padding:1px 7px;border-radius:999px}
+ .pill.active .n{opacity:.9;background:rgba(255,255,255,.22)}
+ main{flex:1 1 auto;min-height:0;padding:12px 16px;overflow:hidden;display:flex;flex-direction:column;gap:10px}
+ .kpis{display:flex;gap:10px;flex:0 0 auto;align-items:stretch}
+ .kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:7px 16px;box-shadow:0 1px 4px rgba(20,49,79,.05)}
+ .kpi b{display:block;font-size:1.25rem;color:var(--navy);line-height:1.1}
+ .kpi span{font-size:.7rem;color:var(--muted)}
+ .cnabtn{margin-left:auto;align-self:center;font-family:inherit;font-size:.85rem;font-weight:600;color:#fff;background:linear-gradient(135deg,#1b3a5b,#2c6196);border:0;border-radius:10px;padding:10px 16px;cursor:pointer;box-shadow:0 2px 8px rgba(20,49,79,.2)}
+ .cnabtn:hover{filter:brightness(1.08)}
+ .work{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:300px 1fr;gap:12px}
+ .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 1px 6px rgba(20,49,79,.05);display:flex;flex-direction:column;min-height:0;min-width:0}
+ .ch{font-weight:700;font-size:.9rem;color:var(--ink);padding:10px 14px 6px;flex:0 0 auto}
+ .ch small{font-weight:500;color:var(--muted);font-size:.74rem;margin-left:5px}
+ .genelist{flex:1 1 auto;min-height:0;overflow-y:auto;padding:4px 8px 8px}
+ .grow{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;cursor:pointer;transition:.1s}
+ .grow:hover{background:#f1f5f9}
+ .grow.sel{background:#e7eef7;outline:1.5px solid #c4d4e8}
+ .gname{font-weight:700;font-size:.9rem;color:var(--navy);min-width:64px}
+ .adot{color:#b21f2d;font-size:.7rem}
+ .gpct{font-size:.82rem;color:var(--ink);margin-left:auto;font-weight:600}
+ .gbar{width:60px;height:6px;background:#edf1f5;border-radius:4px;overflow:hidden;flex:0 0 auto}
+ .gbar > span{display:block;height:100%;background:#2c6196}
+ .detail{padding:0}
+ .dh{padding:12px 16px 8px;border-bottom:1px solid var(--line);flex:0 0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+ .dh b{font-size:1.15rem;color:var(--navy)}
+ .dsub{color:var(--muted);font-size:.85rem}
+ .vcap{flex:0 0 auto;padding:4px 16px 0;font-size:.72rem;color:var(--muted);font-style:italic}
+ .vtable{flex:1 1 auto;min-height:0;overflow-y:auto;padding:6px 16px 12px}
+ table{width:100%;border-collapse:collapse;font-size:.88rem}
+ th{text-align:left;color:var(--muted);font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.03em;padding:5px 6px;position:sticky;top:0;background:#fff}
+ td{padding:6px 6px;border-top:1px solid #f0f3f7} td.num{text-align:right;font-variant-numeric:tabular-nums;width:48px;color:var(--ink)}
+ .badge{font-size:.7rem;font-weight:700;padding:2px 9px;border-radius:999px;color:#fff;white-space:nowrap}
+ .badge.O{background:var(--O)} .badge.LO{background:var(--LO)} .badge.VUS{background:var(--VUS)} .badge.L12{background:var(--navy)}
+ .lv{font-size:.7rem;font-weight:700;padding:2px 9px;border-radius:6px;white-space:nowrap}
+ .lv.a{background:#dff3ea;color:#127053;border:1px solid #aee0cd} /* Level 1-2 actionable */
+ .lv.b{background:#fbf0d6;color:#9a6b00;border:1px solid #f0dca6} /* Level 3 */
+ .lv.c{background:#eef1f4;color:#6b7280;border:1px solid #e0e5ea} /* Level 4 */
+ .lv.none{color:#c2c8d0}
+ .lolbtn{margin-left:auto;font-family:inherit;font-size:.82rem;font-weight:700;color:#fff;background:linear-gradient(135deg,#1b3a5b,#2c6196);border:0;border-radius:9px;padding:8px 14px;cursor:pointer;box-shadow:0 2px 8px rgba(20,49,79,.2)}
+ .lolbtn:hover{filter:brightness(1.08)}
+ .foot{flex:0 0 auto;font-size:.66rem;color:var(--muted);padding:2px 18px 6px}
+ .foot a{color:var(--navy2)}
+ .modal{position:fixed;inset:0;background:rgba(12,24,40,.62);display:none;align-items:center;justify-content:center;z-index:50;padding:24px}
+ .modal.open{display:flex}
+ .mbox{background:#fff;border-radius:16px;width:min(1040px,94vw);height:min(720px,90vh);display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.4);overflow:hidden}
+ .mh{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line)}
+ .mh b{font-size:1.05rem;color:var(--ink)}
+ .mh .x{margin-left:auto;background:#f1f4f8;border:0;width:34px;height:34px;border-radius:9px;font-size:1.1rem;cursor:pointer;color:#334}
+ .mbody{flex:1 1 auto;min-height:0;padding:14px 18px;display:flex;align-items:center;justify-content:center}
+ .mbody img{max-width:100%;max-height:100%;object-fit:contain}
+ .mbody iframe{width:100%;height:100%;border:0}
+ @media(max-width:760px){.work{grid-template-columns:1fr;grid-template-rows:auto 1fr}}
+</style></head><body>
+<div class="top"><h1>SAC Genomic Dashboard</h1><span class="sub">AACR GENIE v18.0-public</span></div>
+<div class="subbar"><span class="sublabel">Tumour subtype</span><div class="pills"><button class="pill active" data-k="All" onclick="showSub('All')">All SACs<span class="n">224</span></button><button class="pill" data-k="EMPD" onclick="showSub('EMPD')">EMPD<span class="n">109</span></button><button class="pill" data-k="Sebaceous" onclick="showSub('Sebaceous')">Sebaceous<span class="n">39</span></button><button class="pill" data-k="Apocrine" onclick="showSub('Apocrine')">Apocrine/eccrine<span class="n">73</span></button></div></div>
+<main>
+  <div class="kpis">
+    <div class="kpi"><b id="k-tmb"></b><span>TMB-high &ge;10</span></div>
+    <div class="kpi"><b id="k-coh"></b><span>Mutation cohort</span></div>
+    <div class="kpi"><b id="k-cna"></b><span>CNA-profiled</span></div>
+    <button class="cnabtn" onclick="openImg('cna')">Copy-number alterations &#8689;</button>
+  </div>
+  <div class="work">
+    <div class="card"><div class="ch">Genes <small>by % mutated</small></div><div class="genelist" id="genelist"></div></div>
+    <div class="card detail">
+      <div class="dh" id="dh"></div>
+      <div class="vcap" id="vcap"></div>
+      <div class="vtable"><table><thead><tr><th>Protein change</th><th class="num">n</th><th>Effect</th><th>OncoKB level</th></tr></thead><tbody id="vtbody"></tbody></table></div>
+    </div>
+  </div>
+</main>
+<div class="foot">No patient-level records are shared (AACR GENIE Terms of Use). Source: <a href="https://genie.synapse.org/">genie.synapse.org</a> &middot; OncoKB &middot; Pfam &middot; g3viz.</div>
+<div class="modal" id="modal"><div class="mbox"><div class="mh"><b id="m-title"></b><button class="x" onclick="closeModal()">&#10005;</button></div><div class="mbody" id="m-body"></div></div></div>
+<script src="genedata.js"></script>
+<script>
+ var KPI={"All":{tmb:"17.0% (38/224)",coh:224,cna:162,lab:"all SACs"},"EMPD":{tmb:"10.1% (11/109)",coh:109,cna:95,lab:"EMPD"},"Sebaceous":{tmb:"28.2% (11/39)",coh:39,cna:18,lab:"sebaceous"},"Apocrine":{tmb:"21.9% (16/73)",coh:73,cna:47,lab:"apocrine/eccrine"}};
+ var cur="All", curGene=null;
+ function clsLabel(c){return c=="O"?"Oncogenic":c=="LO"?"Likely oncogenic":"VUS";}
+ function lvlBadge(l){
+   if(l==="1"||l==="2") return '<span class="lv a">Level '+l+'</span>';
+   if(l&&l.charAt(0)==="3") return '<span class="lv b">Level '+l+'</span>';
+   if(l==="4") return '<span class="lv c">Level 4</span>';
+   return '<span class="lv none">&mdash;</span>';
+ }
+ function showSub(k){
+   cur=k;
+   document.getElementById("k-tmb").textContent=KPI[k].tmb;
+   document.getElementById("k-coh").textContent=KPI[k].coh;
+   document.getElementById("k-cna").textContent=KPI[k].cna;
+   document.querySelectorAll(".pill").forEach(b=>b.classList.toggle("active", b.dataset.k===k));
+   renderList();
+ }
+ function renderList(){
+   var arr=GENEDATA[cur]||[];
+   document.getElementById("genelist").innerHTML = arr.map(function(g,i){
+     return '<div class="grow'+(i===0?' sel':'')+'" data-i="'+i+'" onclick="selGene('+i+')">'+
+       '<span class="gname">'+g.gene+'</span>'+
+       (g.act?'<span class="adot" title="actionable Level 1-2">&#9679;</span>':'')+
+       '<span class="gpct">'+g.pct+'%</span>'+
+       '<span class="gbar"><span style="width:'+Math.min(100,g.pct*2)+'%"></span></span></div>';
+   }).join("");
+   selGene(0);
+ }
+ function selGene(i){
+   var g=(GENEDATA[cur]||[])[i]; if(!g) return; curGene=g.gene;
+   document.querySelectorAll(".grow").forEach(function(r){ r.classList.toggle("sel", r.dataset.i==i); });
+   var btn = g.has_lolli ? '<button class="lolbtn" onclick="openLolliCur()">&#128300; View lollipop &#8689;</button>' : '';
+   document.getElementById("dh").innerHTML='<b>'+g.gene+'</b><span class="dsub">'+g.pct+'% of patients (n='+g.npat+')</span>'+(g.act?' <span class="badge L12">Actionable</span>':'')+btn;
+   document.getElementById("vcap").innerHTML = g.npat+' patient(s) with '+g.gene+' mutations &middot; n = patients carrying each variant (a patient may have &gt;1, so rows can exceed the total)';
+   document.getElementById("vtbody").innerHTML = (g.vars&&g.vars.length)?
+     g.vars.map(function(v){return '<tr><td>'+v.aa+'</td><td class="num">'+v.n+'</td><td><span class="badge '+v.cls+'">'+clsLabel(v.cls)+'</span></td><td>'+lvlBadge(v.lvl)+'</td></tr>';}).join(""):
+     '<tr><td colspan="4" style="color:#9aa">No protein-level changes</td></tr>';
+ }
+ var LW=640, LH=360;
+ function fitLolli(){
+   var w=document.querySelector(".lolwrap"), f=document.getElementById("dlf");
+   if(!w||!f||document.getElementById("dlol").style.display==="none") return;
+   var s=Math.min(w.clientWidth/LW, w.clientHeight/LH);
+   f.style.transform="scale("+s+")";
+   f.style.left=Math.max(0,(w.clientWidth-LW*s)/2)+"px";
+ }
+ window.addEventListener("resize", fitLolli);
+ function openImg(kind){
+   document.getElementById("m-title").textContent="Copy-number alterations — "+KPI[cur].lab;
+   document.getElementById("m-body").innerHTML="<img src=\"charts/"+kind+"_"+cur+".svg\">";
+   document.getElementById("modal").classList.add("open");
+ }
+ function openLolliCur(){
+   if(!curGene) return;
+   document.getElementById("m-title").textContent="Mutation lollipop — "+curGene+" ("+KPI[cur].lab+")";
+   document.getElementById("m-body").innerHTML="<iframe src=\"lollipops/"+cur+"_"+curGene+".html\"></iframe>";
+   document.getElementById("modal").classList.add("open");
+ }
+ function closeModal(){ document.getElementById("modal").classList.remove("open"); document.getElementById("m-body").innerHTML=""; }
+ document.getElementById("modal").addEventListener("click",function(e){ if(e.target===this) closeModal(); });
+ document.addEventListener("keydown",function(e){ if(e.key==="Escape") closeModal(); });
+ showSub("All");
+</script>
+</body></html>
