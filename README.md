@@ -1,4 +1,4 @@
-# Skin Adnexal Carcinomas — Genomic Explorer
+# Skin Adnexal Carcinomas Genomic Explorer
 
 Interactive companion resource to *Costa Filho et al.*, "Genomic Landscape of Skin
 Adnexal Carcinomas." Aggregate genomic summaries (driver / actionable mutations,
@@ -7,7 +7,9 @@ of skin adnexal carcinomas from **AACR Project GENIE v18.0-public**.
 
 **Data note:** Only aggregate summary statistics are shared (mutation/CNA
 frequencies and variant counts). No patient-level records are redistributed, in
-accordance with the AACR GENIE Terms of Use. Source data:
-https://genie.synapse.org/
+accordance with the AACR GENIE Terms of Use. 
+
+If usefull, Please cite our publication on JCO Precision Oncology:
+(in future)
 
 Annotations: OncoKB · Protein domains: Pfam · Visualization: g3viz.
